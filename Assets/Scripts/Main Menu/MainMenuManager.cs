@@ -63,9 +63,11 @@ public class MainMenuManager : MonoBehaviour
 
 	private void getRatingPerLevel(TextMeshProUGUI text1, int index)
 	{
-		if (File.Exists("Level " + index.ToString() + " stats.txt"))
+		string first_path = Application.persistentDataPath + "/";
+
+		if (File.Exists(first_path + "Level " + index.ToString() + " stats.txt"))
 		{
-			int value = int.Parse(File.ReadAllText("Level " + index.ToString() + " stats.txt"));
+			int value = int.Parse(File.ReadAllText(first_path + "Level " + index.ToString() + " stats.txt"));
 			text1.text = "Rating " + value.ToString() + "/3";
 			if (value == 0)
 				text1.color = Color.red;

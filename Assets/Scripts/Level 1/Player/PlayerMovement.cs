@@ -35,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
 	private bool gyroActive;
 	float old_rotation = 0f, new_rotation = 0f;
 	int old_time = 0, new_time = 0;
+	bool wantToJump = false;
 
 	// Energy
 	public static float playerEnergy = 1f;
@@ -76,6 +77,7 @@ public class PlayerMovement : MonoBehaviour
 		notEnoughEnergyError.alpha = 0f;
 		boolGrounded = true;
 		chew_sound = GetComponent<AudioSource>();
+		wantToJump = false;
 	}
 
 	// Face the walking direction
@@ -85,13 +87,11 @@ public class PlayerMovement : MonoBehaviour
 		{ // face right
 			playerSprite.flipX = false;
 			boolRunning = true;
-			playerEnergy -= energyConsumptionPerSprint * Time.deltaTime;
 		}
 		else if (horizontalMovementInput > 0.3f)
 		{ // face left
 			playerSprite.flipX = true;
 			boolRunning = true;
-			playerEnergy -= energyConsumptionPerSprint * Time.deltaTime;
 		}
 		else
 		{ // face ahead
@@ -120,29 +120,26 @@ public class PlayerMovement : MonoBehaviour
 	private void moveToInput()
 	{
 		// Remove energy per jump
-		if (boolGrounded == false && playerEnergy > 0f)
+		if (boolGrounded == true && playerEnergy > 0f && wantToJump == true)
 		{
 			if (boolRunning == true)
 			{
 				timeUntilStartRegeneratingEnergy = 0f;
-				playerEnergy -= energyConsumptionPerSprint * Time.deltaTime;
+				playerEnergy -= energyConsumptionPerSprint;
 				if (playerEnergy < 0f)
 					playerEnergy = 0f;
 
 				Jump();
-				Debug.Log("THIS CASE 1/1;");
 			}
 			else if (boolRunning == false)
 			{
 				Jump();
-				Debug.Log("THIS CASE 2/1;");
 			}
 		}
 		else if (boolGrounded == true && boolRunning == true && playerEnergy > 0f)
 		{
-			Debug.Log("THIS CASE 2;");
 			timeUntilStartRegeneratingEnergy = 0f;
-			playerEnergy -= energyConsumptionPerSprint * Time.deltaTime;
+			playerEnergy -= energyConsumptionPerSprint;
 			if (playerEnergy < 0f)
 				playerEnergy = 0f;
 		}
@@ -155,7 +152,7 @@ public class PlayerMovement : MonoBehaviour
 			timeUntilStartRegeneratingEnergy += Time.deltaTime;
 			if (timeUntilStartRegeneratingEnergy > startRegeneratingEnergyTime)
 			{
-				playerEnergy += energyConsumptionPerSprint * Time.deltaTime;
+				playerEnergy += energyConsumptionPerSprint;
 				if (playerEnergy > 1f)
 					playerEnergy = 1f;
 			}
@@ -184,6 +181,14 @@ public class PlayerMovement : MonoBehaviour
 
 		// Change energy slider
 		energySlider.value = playerEnergy;
+
+		// Check for jump
+		// -1 good
+		// greater than -0.5, jump
+		if (gyro.gravity.y > -0.50f && boolGrounded == true)
+			wantToJump = true;
+		else
+			wantToJump = false;
 	}
 
 	private void Jump()
@@ -198,6 +203,7 @@ public class PlayerMovement : MonoBehaviour
 			body.velocity = new Vector2(body.velocity.x, playerJumpForce);
 			boolGrounded = false;
 			playerEnergy -= energyConsumptionPerJump;
+			timeUntilStartRegeneratingEnergy = 0f;
 		}
 	}
 

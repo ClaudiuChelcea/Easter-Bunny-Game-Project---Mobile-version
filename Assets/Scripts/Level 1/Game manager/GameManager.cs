@@ -93,16 +93,18 @@ public class GameManager : MonoBehaviour
 			}
 			totalEggsText.text = "Got rating " + count_eggs_received.ToString() + "!";
 
+			string first_path = Application.persistentDataPath + "/";
+
 			// Write output to file
-			if (File.Exists("Level " + SceneManager.GetActiveScene().buildIndex + " stats.txt"))
+			if (File.Exists(first_path + "Level " + SceneManager.GetActiveScene().buildIndex + " stats.txt"))
 			{
-				int prev_rating = int.Parse(File.ReadAllText("Level " + SceneManager.GetActiveScene().buildIndex + " stats.txt"));
+				int prev_rating = int.Parse(File.ReadAllText(first_path + "Level " + SceneManager.GetActiveScene().buildIndex + " stats.txt"));
 				if (count_eggs_received > prev_rating)
-					File.WriteAllText("Level " + SceneManager.GetActiveScene().buildIndex + " stats.txt", count_eggs_received.ToString());
+					File.WriteAllText(first_path + "Level " + SceneManager.GetActiveScene().buildIndex + " stats.txt", count_eggs_received.ToString());
 			}
 			else
 			{
-				File.WriteAllText("Level " + SceneManager.GetActiveScene().buildIndex + " stats.txt", count_eggs_received.ToString());
+				File.WriteAllText(first_path + "Level " + SceneManager.GetActiveScene().buildIndex + " stats.txt", count_eggs_received.ToString());
 			}
 		}
 	}
